@@ -45,7 +45,7 @@ services:
     image: phpmyadmin/phpmyadmin
     restart: always
     ports:
-      - "8084:80"
+      - "8086:80"
     environment:
       MAX_EXECUTION_TIME: 600
       UPLOAD_LIMIT: 800M
