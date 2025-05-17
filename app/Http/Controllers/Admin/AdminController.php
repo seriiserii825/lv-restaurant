@@ -11,6 +11,15 @@ use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
+    public function index()
+    {
+        $admin = Admin::all();
+        return response()->json([
+            'status' => 'success',
+            'data' => $admin,
+        ]);
+    }
+
     public function login(AdminLoginRequest $request)
     {
         $user = Admin::where('email', $request->email)->first();

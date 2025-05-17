@@ -18,7 +18,8 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->midd
 
 Route::group(['prefix' => 'admin'], function () {
     Route::post('/login', [AdminController::class, 'login']);
-    Route::group(['middleware' => 'auth:admin'], function () {
+    Route::group(['middleware' => ['auth:admin', 'admin']], function () {
+        Route::get('/dashboard', [AdminController::class, 'index']);
         Route::post('/logout', [AdminController::class, 'logout']);
     });
 });
