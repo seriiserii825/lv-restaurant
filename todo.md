@@ -1,7 +1,14 @@
-## login page add link to forgot password
+## make email
 
-## create a page forgot password in /admin and copy login page and leave just email
+make:mail ForgotPasswordMail
 
-## in api.php create route for forgot password /admin/forgot-password
+## in mail create 2 public vars $subject and $body
 
-## copy action store from PasswordResetLinkController.php
+## pass vars to the constructor
+
+## in function envelope pass $subject 
+
+## in function content pass path to mail, admin.email and create this file
+
+## in Admin controller forgotPassword check for email if exists in Admin table
+
