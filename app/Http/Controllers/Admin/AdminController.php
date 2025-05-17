@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AdminLoginRequest;
+use App\Mail\ForgotPasswordMail;
 use App\Models\Admin;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 
@@ -51,28 +53,57 @@ class AdminController extends Controller
 
     public function forgotPassword(Request $request): JsonResponse
     {
-
         $request->validate([
             'email' => ['required', 'email'],
         ]);
 
-        // We will send the password reset link to this user. Once we have attempted
-        // to send the link, we will examine the response then see the message we
-        // need to show to the user. Finally, we'll send out a proper response.
-        // $status = Password::sendResetLink(
-        //     $request->only('email')
-        // );
-
-        $status = Password::broker('admins')->sendResetLink(
-            $request->only('email')
-        );
-
-        if ($status != Password::RESET_LINK_SENT) {
-            throw ValidationException::withMessages([
-                'email' => [__($status)],
-            ]);
+        $user = Admin::where('email', $request->email)->first();
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
         }
 
-        return response()->json(['status' => __($status)]);
+        $token = Password::broker('admins')->createToken($user);
+        $user->token = $token;
+        $user->update();
+
+        // $url = url('/admin/reset-password/' . $token . '?email=' . $request->email);
+        // url localhost:3000
+        $url = 'http://localhost:3000/admin/reset-password/' . $token . '?email=' . $request->email;
+
+        $subject = 'Reset Password Notification';
+        $body = 'Click here to reset your password: <a href="' . $url . '">Reset Password</a>';
+        Mail::to($request->email)->send(new ForgotPasswordMail($subject, $body));
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Password reset link sent to your email address.',
+        ]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required', 'confirmed', 'min:8'],
+            'token' => ['required', 'string'],
+        ]);
+
+        $user = Admin::where('email', $request->email)->first();
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $response = Password::broker('admins')->reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->password = Hash::make($password);
+                $user->save();
+            }
+        );
+
+        if ($response == Password::PASSWORD_RESET) {
+            return response()->json(['message' => 'Password reset successfully'], 200);
+        } else {
+            return response()->json(['message' => 'Failed to reset password'], 500);
+        }
     }
 }

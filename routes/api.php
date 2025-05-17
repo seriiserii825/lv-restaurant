@@ -17,9 +17,11 @@ Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->middleware('auth:sanctum');
 
 
+
 Route::group(['prefix' => 'admin'], function () {
     Route::post('/login', [AdminController::class, 'login']);
     Route::post('/forgot-password', [AdminController::class, 'forgotPassword']);
+    Route::post('/reset-password', [AdminController::class, 'resetPassword']);
 
     // middleware for admin routes
     Route::group(['middleware' => ['auth:admin', 'admin']], function () {
