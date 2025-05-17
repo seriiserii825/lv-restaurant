@@ -1,28 +1,7 @@
-create middleware Admin
+## login page add link to forgot password
 
-in app.php
-```php
-->withMiddleware(function(Middleware $middleware) {
-    $middleware->add('admin', function($request, $response, $next) {
-        $middleware->alias([
-            'admin' => AdminMiddleware::class,
-        ]);
-    });
-});
+## create a page forgot password in /admin and copy login page and leave just email
 
-in AdminMiddleware.php
-```php
-<?php
-if (!Auth::guard('admin')->check()) {
-    return response()->json(['message' => "You don't have permission to access this page!!!"], 403);
-}
+## in api.php create route for forgot password /admin/forgot-password
 
-return $next($request);
-```
-
-in api.php
-```php
-Route::group(['middleware' => 'admin'], function () {
-    Route dashboard
-});
-```
+## copy action store from PasswordResetLinkController.php
