@@ -18,6 +18,9 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->midd
 
 Route::group(['prefix' => 'admin'], function () {
     Route::post('/login', [AdminController::class, 'login']);
+    Route::group(['middleware' => 'auth:admin'], function () {
+        Route::post('/logout', [AdminController::class, 'logout']);
+    });
 });
 
 // http://localhost:8080/verify-email/3/14d06ee30874a894fc1fa2d4ba4b47ec56e6eaa3?expires=1747387399&signature=5b34d0c1d9b32152e98fb22c9686c973b5141cc5f146278148d29fd284f64652
