@@ -25,6 +25,7 @@ Route::group(['prefix' => 'admin'], function () {
 
     // middleware for admin routes
     Route::group(['middleware' => ['auth:admin', 'admin']], function () {
+        Route::get('/user', [AdminController::class, 'getUser']);
         Route::get('/dashboard', [AdminController::class, 'index']);
         Route::post('/logout', [AdminController::class, 'logout']);
     });

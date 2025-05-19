@@ -8,6 +8,7 @@ use App\Mail\ForgotPasswordMail;
 use App\Models\Admin;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
@@ -21,6 +22,13 @@ class AdminController extends Controller
             'status' => 'success',
             'data' => $admin,
         ]);
+    }
+
+    public function getUser()
+    {
+       $auth_user = Auth::user();
+       $user = Admin::where('id', $auth_user->id)->first();
+       return response()->json($user);
     }
 
     public function login(AdminLoginRequest $request)
